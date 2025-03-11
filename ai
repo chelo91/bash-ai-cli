@@ -1,55 +1,55 @@
 #!/bin/bash
 
-# Configuración
+# Configuration
 CONFIG_FILE="$HOME/Scripts/.config"
 
-# Verificar archivo de configuración
+# Verify configuration file
 if [[ ! -f "$CONFIG_FILE" ]]; then
-    echo "Error: Archivo de configuración no encontrado en $CONFIG_FILE." >&2
+    echo "Error: Configuration file not found at $CONFIG_FILE." >&2
     exit 1
 fi
 
-# Cargar configuraciones
+# Load configurations
 source "$CONFIG_FILE"
 
 if [[ -z "$API_KEY" ]]; then
-    echo "Error: Variable API_KEY no definida en el archivo de configuración." >&2
+    echo "Error: API_KEY variable not defined in configuration file." >&2
     exit 1
 fi
 
 if [[ -z "$PROMPT" ]]; then
-    echo "Error: Variable PROMPT no definida en el archivo de configuración." >&2
+    echo "Error: PROMPT variable not defined in configuration file." >&2
     exit 1
 fi
 
 if [[ -z "$API_URL" ]]; then
-    echo "Error: Variable API_URL no definida en el archivo de configuración." >&2
+    echo "Error: API_URL variable not defined in configuration file." >&2
     exit 1
 fi
 
 if [[ -z "$MODEL" ]]; then
-    echo "Error: Variable MODEL no definida en el archivo de configuración." >&2
+    echo "Error: MODEL variable not defined in configuration file." >&2
     exit 1
 fi
 
-# Capturar entrada desde pipe o argumentos
+# Capture input from pipe or arguments
 if ! [[ -t 0 ]]; then
     MESSAGE=$(cat)
 fi
 
-# Si hay argumentos, agrégalos correctamente (con espacio si MESSAGE ya tiene algo)
+# If there are arguments, add them correctly (with space if MESSAGE already has content)
 [[ -n "$1" ]] && MESSAGE="${MESSAGE:+$MESSAGE }$*"
 
-# Escapar el mensaje para JSON de manera segura
+# Escape the message for JSON safely
 MESSAGE=$(jq -R -s '.' <<< "$MESSAGE")
 
-# Validar mensaje
+# Validate message
 if [[ -z "$MESSAGE" ]]; then
-    echo "Uso: $0 <mensaje>" >&2
+    echo "Usage: $0 <message>" >&2
     exit 1
 fi
 
-# Realizar solicitud a la API
+# Make API request
 RESPONSE=$(curl -s -X POST "$API_URL" \
     -H "Authorization: Bearer $API_KEY" \
     -H "Content-Type: application/json" \
@@ -63,16 +63,16 @@ RESPONSE=$(curl -s -X POST "$API_URL" \
 }
 EOF
 ) || {
-    echo "Error: Falló la conexión con la API." >&2
+    echo "Error: API connection failed." >&2
     exit 1
 }
 
-# Extraer y mostrar la respuesta
+# Extract and display the response
 FINAL_RESPONSE=$(jq -r '.choices[0].message.content' <<< "$RESPONSE")
 
 if [[ -z "$FINAL_RESPONSE" || "$FINAL_RESPONSE" == "null" ]]; then
-    echo "Error: Respuesta no válida de la API." >&2
-    echo "Respuesta completa de la API:" >&2
+    echo "Error: Invalid API response." >&2
+    echo "Complete API response:" >&2
     echo "$RESPONSE" | jq '.' >&2
     exit 1
 fi
