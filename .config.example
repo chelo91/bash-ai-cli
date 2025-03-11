@@ -1,0 +1,4 @@
+API_URL=""
+API_KEY=""
+MODEL=""
+PROMPT="Responde de manera concisa y directa, sin explicaciones adicionales pero de forma amistosa."

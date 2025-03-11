@@ -1,0 +1,80 @@
+#!/bin/bash
+
+# Configuración
+CONFIG_FILE="$HOME/Scripts/.config"
+
+# Verificar archivo de configuración
+if [[ ! -f "$CONFIG_FILE" ]]; then
+    echo "Error: Archivo de configuración no encontrado en $CONFIG_FILE." >&2
+    exit 1
+fi
+
+# Cargar configuraciones
+source "$CONFIG_FILE"
+
+if [[ -z "$API_KEY" ]]; then
+    echo "Error: Variable API_KEY no definida en el archivo de configuración." >&2
+    exit 1
+fi
+
+if [[ -z "$PROMPT" ]]; then
+    echo "Error: Variable PROMPT no definida en el archivo de configuración." >&2
+    exit 1
+fi
+
+if [[ -z "$API_URL" ]]; then
+    echo "Error: Variable API_URL no definida en el archivo de configuración." >&2
+    exit 1
+fi
+
+if [[ -z "$MODEL" ]]; then
+    echo "Error: Variable MODEL no definida en el archivo de configuración." >&2
+    exit 1
+fi
+
+# Capturar entrada desde pipe o argumentos
+if ! [[ -t 0 ]]; then
+    MESSAGE=$(cat)
+fi
+
+# Si hay argumentos, agrégalos correctamente (con espacio si MESSAGE ya tiene algo)
+[[ -n "$1" ]] && MESSAGE="${MESSAGE:+$MESSAGE }$*"
+
+# Escapar el mensaje para JSON de manera segura
+MESSAGE=$(jq -R -s '.' <<< "$MESSAGE")
+
+# Validar mensaje
+if [[ -z "$MESSAGE" ]]; then
+    echo "Uso: $0 <mensaje>" >&2
+    exit 1
+fi
+
+# Realizar solicitud a la API
+RESPONSE=$(curl -s -X POST "$API_URL" \
+    -H "Authorization: Bearer $API_KEY" \
+    -H "Content-Type: application/json" \
+    -d @- << EOF
+{
+    "model": "$MODEL",
+    "messages": [
+        { "role": "system", "content": "$PROMPT" },
+        { "role": "user", "content": ${MESSAGE} }
+    ]
+}
+EOF
+) || {
+    echo "Error: Falló la conexión con la API." >&2
+    exit 1
+}
+
+# Extraer y mostrar la respuesta
+FINAL_RESPONSE=$(jq -r '.choices[0].message.content' <<< "$RESPONSE")
+
+if [[ -z "$FINAL_RESPONSE" || "$FINAL_RESPONSE" == "null" ]]; then
+    echo "Error: Respuesta no válida de la API." >&2
+    echo "Respuesta completa de la API:" >&2
+    echo "$RESPONSE" | jq '.' >&2
+    exit 1
+fi
+
+echo "$FINAL_RESPONSE"
