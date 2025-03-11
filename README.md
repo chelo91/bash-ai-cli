@@ -1,4 +1,4 @@
-# AI CLI Script
+# Bash AI Cli
 
 Command-line script to interact with AI models quickly and easily.
 
@@ -10,7 +10,7 @@ Command-line script to interact with AI models quickly and easily.
 mkdir -p $HOME/Scripts && cd $HOME/Scripts
 
 # Download the script directly to Scripts
-git clone https://github.com/chelo91/tu-repo.git ./
+git clone https://github.com/chelo91/bash-ai-cli.git ./
 chmod +x ai
 ```
 
