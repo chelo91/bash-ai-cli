@@ -47,14 +47,23 @@ source ~/.zshrc
 
 ## 📝 Usage
 
-### Method 1: Direct arguments
+El script puede ser usado de varias formas:
+
+### 1. Consulta directa
+Realiza una pregunta directamente desde la línea de comandos:
 ```bash
-ai "What is the capital of Uruguay?"
+ai How do I create a directory in Linux
+
+ai Explain this code: < mycode.js
 ```
 
-### Method 2: Using pipe
+### 2. Usando pipe (|)
+Envía el contenido de un archivo o comando como contexto:
 ```bash
-echo "What is the capital of Uruguay?" | ai
+cat myfile.txt | ai What does this code do
+
+ls -la | ai Explain these files
+
 ```
 
 ## ⚙️ Requirements
