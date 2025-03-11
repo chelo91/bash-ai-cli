@@ -1,4 +1,4 @@
-# Bash AI Cli
+# Bash AI CLI
 
 Command-line script to interact with AI models quickly and easily.
 
@@ -47,23 +47,22 @@ source ~/.zshrc
 
 ## 📝 Usage
 
-El script puede ser usado de varias formas:
+The script can be used in several ways:
 
-### 1. Consulta directa
-Realiza una pregunta directamente desde la línea de comandos:
+### 1. Direct Query
+Make a question directly from the command line:
 ```bash
 ai How do I create a directory in Linux
 
 ai Explain this code: < mycode.js
 ```
 
-### 2. Usando pipe (|)
-Envía el contenido de un archivo o comando como contexto:
+### 2. Using pipe (|)
+Send file content or command output as context:
 ```bash
 cat myfile.txt | ai What does this code do
 
 ls -la | ai Explain these files
-
 ```
 
 ## ⚙️ Requirements
